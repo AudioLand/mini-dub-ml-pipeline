@@ -24,14 +24,6 @@ def update_project_status_and_translated_link_by_id(
             message=f"Project fields to update: {project_fields_to_update}"
         )
 
-    # request_time = datetime.now()
-    # response = requests.post(
-    #     UPDATE_PROJECT_URL,
-    #     project_fields_to_update,
-    # )
-    # response_time = datetime.now()
-    # time_difference = response_time - request_time
-
     firestore = get_firestore()
     project_ref = firestore.collection(MINI_PROJECTS_COLLECTION).document(project_id)
     project_snap = project_ref.get()
