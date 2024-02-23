@@ -7,8 +7,3 @@ services:
     command: "python3 /app/src/main.py"
     ports:
       - "8081:8080"
-    volumes:
-      - mini-dub-ml-pipeline:/app/src/tmp
-
-volumes:
-  mini-dub-ml-pipeline:
