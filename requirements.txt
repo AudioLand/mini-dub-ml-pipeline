@@ -1,22 +1,13 @@
 requests==2.31.0
 fastapi==0.109.2
-openai==0.28
 firebase_admin
 python-dotenv==1.0.0
 sentry-sdk
-# pytube
 pydub==0.25.1
-elevenlabs==0.2.24
 uvicorn
 langchain==0.0.335
 pydantic==1.10.9
 moviepy==1.0.3
-azure-cognitiveservices-speech
-pyopenssl
-ndg-httpsclient
-pyasn1
-urllib3
-ffprobe
 audiostretchy
 openai-whisper
 TTS
