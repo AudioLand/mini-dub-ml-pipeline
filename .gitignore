@@ -1,0 +1,13 @@
+# IDEs dirs
+.idea/
+.vscode/
+
+# Python dirs
+__pycache__/
+venv/
+
+# Environment
+.env
+
+# Temporary files dir
+tmp/
