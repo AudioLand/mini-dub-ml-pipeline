@@ -18,6 +18,7 @@ AUDIO_SEGMENT_PAUSE = 3000  # 3 sec
 device = "cuda" if cuda.is_available() else "cpu"
 shouldUseGPU = device == "cuda"
 tts_model = "tts_models/multilingual/multi-dataset/xtts_v2"
+TTS().download_model_by_name(tts_model)
 
 
 def get_manager():
