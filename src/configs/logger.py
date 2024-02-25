@@ -43,7 +43,7 @@ def catch_error(
 
 
 def print_info_log(tag: LogTag, message: str):
-    logging.info(msg=f"({tag}) {message}")
+    logging.info(msg=f"({tag.value}) {message}")
 
 
 if __name__ == "__main__":
