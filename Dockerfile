@@ -1,5 +1,7 @@
 FROM python:3.11
 
+ENV ACCEPT_SOX_LICENSE=TRUE
+
 WORKDIR /app
 COPY . /app
 
