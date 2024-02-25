@@ -67,6 +67,10 @@ def translate_text(
         final_translated_text = "".join(translated_text_chunks)
         translated_text_segments: List[str] = re.findall(r"[^\[\]]+", final_translated_text)
 
+        # Clear translated text with empty chunks
+        while ' ' in translated_text_segments:
+            translated_text_segments.remove(' ')
+
         if show_logs:
             print_info_log(
                 tag=LogTag.TRANSLATE_TEXT,
@@ -119,8 +123,8 @@ if __name__ == "__main__":
     test_target_language = "ru"
     test_project_id = "07fsfECkwma6fVTDyqQf"
     test_translated_text_segments = translate_text(
-        language=test_target_language,
         text_segments=test_text_segments,
+        language=test_target_language,
         project_id=test_project_id,
         show_logs=True
     )
