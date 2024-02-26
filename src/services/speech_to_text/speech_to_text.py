@@ -9,8 +9,6 @@ from constants.log_tags import LogTag
 from constants.whisper_model import WhisperModel
 from models.text_segment import TextSegment
 
-MINIMUM_AUDIO_LENGTH_MS = 100  # 0.1 seconds in milliseconds
-
 # Load whisper model by name
 model = load_model(WhisperModel.BASE)
 
@@ -30,7 +28,11 @@ def speech_to_text(file_path: str, project_id: str, show_logs: bool = False) -> 
             )
 
         audio = load_audio(file_path)
-        result = model.transcribe(audio)
+        result = model.transcribe(
+            audio,
+            temperature=1.0,
+            no_speech_threshold=0.2,
+        )
         transcript_parts = [TextSegment(
             original_timestamp=(segment['start'], segment['end']),
             text=segment['text']
