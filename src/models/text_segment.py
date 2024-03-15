@@ -6,6 +6,7 @@ from pydantic import BaseModel
 class TextSegment(BaseModel):
     original_timestamp: Tuple[float, float]
     text: str
+    speaker: int = 0
 
 
 class TextSegmentWithAudioTimestamp(TextSegment):

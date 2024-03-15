@@ -8,6 +8,9 @@ uvicorn
 langchain==0.0.335
 pydantic==1.10.9
 moviepy==1.0.3
+googletrans==4.0.0-rc1
+pyannote.audio
+speechbrain
 audiostretchy
 openai-whisper
 TTS

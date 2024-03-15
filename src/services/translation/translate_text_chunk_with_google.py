@@ -1,19 +1,11 @@
-from azure.ai.translation.text import TextTranslationClient, TranslatorCredential
-from azure.ai.translation.text.models import InputTextItem
+from googletrans import Translator
 
-from configs.env import MICROSOFT_TRANSLATOR_API_KEY, MICROSOFT_TRANSLATOR_REGION
 from configs.logger import print_info_log, catch_error
 from constants.log_tags import LogTag
 
-credentials = TranslatorCredential(
-    key=MICROSOFT_TRANSLATOR_API_KEY,
-    region=MICROSOFT_TRANSLATOR_REGION,
-)
+translator = Translator()
 
-translator = TextTranslationClient(credential=credentials)
-
-
-def translate_text_chunk_with_microsoft(
+def translate_text_chunk_with_google(
     text_chunk: str,
     language: str,
     project_id: str,
@@ -30,7 +22,7 @@ def translate_text_chunk_with_microsoft(
     Returns:
     - str: Translated text or original text if translation is not possible.
     """
-    log_tag = LogTag.TRANSLATE_TEXT_CHUNK_WITH_MICROSOFT
+    log_tag = LogTag.TRANSLATE_TEXT_CHUNK_WITH_GOOGLE
 
     if show_logs:
         print_info_log(
@@ -38,20 +30,17 @@ def translate_text_chunk_with_microsoft(
             message=f"Translating text chunk: '{text_chunk}'"
         )
 
-    translation_response = translator.translate(
-        content=[InputTextItem(text=text_chunk)],
-        to=[language],
-    )
+    translation = translator.translate(text_chunk,  dest=language)
 
-    if len(translation_response) == 0:
+    if len(translation.text) == 0:
         catch_error(
             tag=log_tag,
-            error=Exception(f"Microsoft could not translate text chunk: {text_chunk}"),
+            error=Exception(f"Google could not translate text chunk: {text_chunk}"),
             project_id=project_id
         )
 
-    # Get translated text from Microsoft response
-    translated_text = translation_response[0].translations[0].text
+    # Get translated text from Google response
+    translated_text = translation.text
 
     if show_logs:
         print_info_log(

@@ -6,7 +6,7 @@ from constants.log_tags import LogTag
 from models.text_segment import TextSegment
 from services.translation.combine_text_segments import combine_text_segments
 from services.translation.split_text_to_chunks import split_text_to_chunks
-from services.translation.translate_text_chunk_with_microsoft import translate_text_chunk_with_microsoft
+from services.translation.translate_text_chunk_with_google import translate_text_chunk_with_google
 
 
 def translate_text(
@@ -45,7 +45,7 @@ def translate_text(
 
         translated_text_chunks = []
         for chuck in text_chunks:
-            translated_chunk = translate_text_chunk_with_microsoft(
+            translated_chunk = translate_text_chunk_with_google(
                 language=language,
                 text_chunk=chuck,
                 project_id=project_id,

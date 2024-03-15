@@ -14,7 +14,7 @@ class LogTag(Enum):
     WHISPER_ENDPOINT_REQUEST = "whisper_endpoint_request"
     WHISPER_ENDPOINT_RESPONSE = "whisper_endpoint_response"
     SPLIT_TEXT_TO_CHUNKS = "split_text_to_chunks"
-    TRANSLATE_TEXT_CHUNK_WITH_MICROSOFT = "translate_text_chunk_with_microsoft"
+    TRANSLATE_TEXT_CHUNK_WITH_GOOGLE = "translate_text_chunk_with_google"
     TRANSLATE_TEXT = "translate_text"
     COMBINE_TEXT_SEGMENTS = "combine_text_segments"
     TEXT_TO_SPEECH = "text_to_speech"
