@@ -1,10 +1,9 @@
 import os
 import re
 
-import soundfile as sf
-from typing import List
-
 import torch
+from moviepy.audio.io.AudioFileClip import AudioFileClip
+from moviepy.video.io.VideoFileClip import VideoFileClip
 from pyannote.audio import Pipeline
 from whisper import load_model, load_audio
 from whisper.audio import SAMPLE_RATE
@@ -19,6 +18,12 @@ from models.text_segment import TextSegment
 model = load_model(WhisperModel.BASE)
 
 
+# Функция для проверки расширения файла
+def check_audio_format(file_path, desired_format=".wav"):
+    _, file_extension = os.path.splitext(file_path)
+    return file_extension.lower() == desired_format
+
+
 def transcribe_segment(audio, start, end):
     audio_segment = audio[int(start * SAMPLE_RATE):int(end * SAMPLE_RATE)]
 
@@ -26,7 +31,8 @@ def transcribe_segment(audio, start, end):
     return result['text']
 
 
-def speech_to_text(file_path: str, project_id: str, is_cloning: bool, show_logs: bool = False):
+def speech_to_text(file_path: str, project_id: str, is_cloning: bool, show_logs: bool = False, num_speakers: int = None,
+                   processed_project_is_video: bool = False):
     """Convert the audio content of file into text."""
 
     try:
@@ -44,16 +50,29 @@ def speech_to_text(file_path: str, project_id: str, is_cloning: bool, show_logs:
 
         transcript_parts = []
 
-        if is_cloning:
+        if is_cloning or (num_speakers and num_speakers > 1):
             audio_temp_path = f"{PROCESSING_FILES_DIR_PATH}/orig.wav"
-            sf.write(audio_temp_path, audio, SAMPLE_RATE)
+            if processed_project_is_video:
+                # Обрабатываем видео файл: извлекаем аудио
+                video = VideoFileClip(file_path)
+                audio_temp = video.audio
+                audio_temp.write_audiofile(audio_temp_path)
+            else:
+                # Проверяем формат аудио файла
+                if check_audio_format(file_path):
+                    audio_temp_path = file_path
+                else:
+                    # Конвертируем аудио файл в WAV
+                    audio_temp = AudioFileClip(file_path)
+                    audio_temp.write_audiofile(audio_temp_path)
+
             # TODO: speakers number.
             pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization-3.1",
                                                 use_auth_token=os.getenv("HUGGING_FACE_TOKEN"))
 
             if torch.cuda.is_available():
                 pipeline.to(torch.device("cuda"))
-            diarization = pipeline(audio_temp_path)
+            diarization = pipeline(audio_temp_path, num_speakers=num_speakers)
             for turn, _, speaker in diarization.itertracks(yield_label=True):
                 start, end = turn.start, turn.end
                 transcript = transcribe_segment(audio, start, end)

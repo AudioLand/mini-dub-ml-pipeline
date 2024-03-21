@@ -65,7 +65,7 @@ def translate_text(
 
         # Split translated text to get original segments
         final_translated_text = "".join(translated_text_chunks)
-        translated_text_segments: List[str] = re.findall(r"[^\[\]]+", final_translated_text)
+        translated_text_segments: List[str] = re.findall(r"[—-]\s?[\"«]([^«»\"]*)[\"»]", final_translated_text)
 
         # Clear translated text with empty chunks
         while ' ' in translated_text_segments:

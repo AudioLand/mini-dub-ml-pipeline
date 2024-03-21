@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from typing import List
 
 from fastapi import APIRouter
 
@@ -25,7 +26,9 @@ def generate(
     project_id: str,
     target_language: str,
     original_file_location: str,
-    voice_file_path: str,
+    voice_ids: List[int],
+    is_cloning: bool,
+    num_speakers: int = None
 ):
     """
     Generates a dubbed version of the original video or audio file in the target language
@@ -38,13 +41,6 @@ def generate(
 
     :return: Upload the dubbed video to Firebase Cloud Storage
 
-    :Example:
-    >>> generate(
-    ...     project_id=f"07fsfECkwma6fVTDyqQf",
-    ...     target_language="Russian",
-    ...     original_file_location="z8Z5j71WbmhaioUHDHh5KrBqEO13/07fsfECkwma6fVTDyqQf/test-video-1min.mp4",
-    ...     speaker_file_path="z8Z5j71WbmhaioUHDHh5KrBqEO13/07fsfECkwma6fVTDyqQf/voice.mp4",
-    ... )
     Check if project_id and original_file_location exist in Firebase
     """
 
@@ -106,10 +102,21 @@ def generate(
             message="Starting speech to text..."
         )
 
-        original_text_segments = speech_to_text(
+        local_original_file_path = original_file_location
+
+        # TODO chage for exception
+        assert (is_cloning and not voice_ids) or not is_cloning
+        if not num_speakers and voice_ids:
+            num_speakers = len(voice_ids)
+
+        processed_project_is_video = get_file_type(local_original_file_path) == FileType.VIDEO
+        original_text_segments, audio = speech_to_text(
             file_path=local_original_file_path,
             project_id=project_id,
-            show_logs=True
+            show_logs=True,
+            is_cloning=is_cloning,
+            num_speakers=num_speakers,
+            processed_project_is_video=processed_project_is_video
         )
 
         print_info_log(
@@ -136,31 +143,6 @@ def generate(
             message="Translation completed."
         )
 
-        """Download user voice for voice cloning in TTS"""
-
-        print_info_log(
-            tag=LogTag.MAIN,
-            message="Downloading user voice for cloning from Cloud Storage..."
-        )
-
-        voice_blob_path = voice_file_path
-        # Extract extension from the voice file location
-        voice_file_extension = get_file_extension(voice_file_path)
-        # Combine project_id with the extracted extension
-        local_voice_file_path = f"{PROCESSING_FILES_DIR_PATH}/{project_id}-voice.{voice_file_extension}"
-        # Download file
-        download_blob(
-            source_blob_path=voice_blob_path,
-            destination_file_path=local_voice_file_path,
-            project_id=project_id,
-            show_logs=True
-        )
-
-        print_info_log(
-            tag=LogTag.MAIN,
-            message="User voice downloaded."
-        )
-
         """Generate audio from translated text"""
 
         print_info_log(
@@ -171,9 +153,11 @@ def generate(
         local_translated_audio_path, translated_text_segments_with_audio_timestamp = text_to_speech(
             text_segments=translated_text_segments,
             language=target_language,
-            speaker_file_path=local_voice_file_path,
+            is_cloning=is_cloning,
+            voice_ids=voice_ids,
             project_id=project_id,
-            show_logs=True
+            show_logs=True,
+            audio=audio
         )
 
         print_info_log(
@@ -183,7 +167,6 @@ def generate(
 
         """Overlay audio to video"""
 
-        processed_project_is_video = get_file_type(local_original_file_path) == FileType.VIDEO
         # Overlay audio if project is video
         if processed_project_is_video:
             print_info_log(
@@ -196,7 +179,7 @@ def generate(
                 audio_path=local_translated_audio_path,
                 text_segments_with_audio_timestamp=translated_text_segments_with_audio_timestamp,
                 project_id=project_id,
-                remove_original_audio=True,
+                remove_original_audio=False,
                 speedup_slow_audio=False,
                 show_logs=True
             )
@@ -246,7 +229,6 @@ def generate(
 
         # Remove original file
         os.remove(local_original_file_path)
-        os.remove(local_voice_file_path)
         # Remove translated file
         if processed_project_is_video:
             os.remove(local_translated_file_path)
@@ -301,12 +283,19 @@ if __name__ == "__main__":
     test_project_id = "07fsfECkwma6fVTDyqQf"
     test_media_file_name = "test-video-1min.mp4"
     test_voice_file_name = "voice.mp3"
-    test_target_language = "ru"
+    test_target_language = "russian"
     test_original_file_location = f"{test_user_id}/{test_project_id}/{test_media_file_name}"
     test_voice_file_location = f"{test_user_id}/{test_project_id}/{test_voice_file_name}"
+
+    voice_ids = [313, 97]
+    language = "russian"
+    is_cloning = False
+    test_original_file_location = "en_short_2_speakers.mp4"
+
     generate(
         project_id=test_project_id,
         target_language=test_target_language,
         original_file_location=test_original_file_location,
-        voice_file_path=test_voice_file_location,
+        voice_ids=voice_ids,
+        is_cloning=is_cloning
     )

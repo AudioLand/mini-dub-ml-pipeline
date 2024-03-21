@@ -23,7 +23,7 @@ def combine_text_segments(text_segments: List[TextSegment], show_logs: bool) -> 
 
     formatted_text = ""
     for segment in text_segments:
-        formatted_text += f"[{segment.text}]"
+        formatted_text += f" —\"{segment.text}\""
 
     if show_logs:
         print_info_log(

@@ -12,12 +12,12 @@ def translate_text_chunk_with_google(
     show_logs: bool
 ) -> str:
     """
-    Translates a given text into the specified language using Microsoft Translator.
+    Translates a given text into the specified language using Google Translator.
 
     :param text_chunk: The text chunks to be translated.
     :param language: The target language for translation.
     :param project_id: The id of the processing project.
-    :param show_logs: Determines whether to display logs while translating with gpt.
+    :param show_logs: Determines whether to display logs while translating.
 
     Returns:
     - str: Translated text or original text if translation is not possible.
@@ -30,7 +30,7 @@ def translate_text_chunk_with_google(
             message=f"Translating text chunk: '{text_chunk}'"
         )
 
-    translation = translator.translate(text_chunk,  dest=language)
+    translation = translator.translate(text_chunk,  dest=language, src="english")
 
     if len(translation.text) == 0:
         catch_error(
