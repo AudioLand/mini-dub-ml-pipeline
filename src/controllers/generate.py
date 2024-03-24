@@ -102,7 +102,6 @@ def generate(
             message="Starting speech to text..."
         )
 
-        local_original_file_path = original_file_location
 
         # TODO chage for exception
         assert (is_cloning and not voice_ids) or not is_cloning
@@ -287,10 +286,10 @@ if __name__ == "__main__":
     test_original_file_location = f"{test_user_id}/{test_project_id}/{test_media_file_name}"
     test_voice_file_location = f"{test_user_id}/{test_project_id}/{test_voice_file_name}"
 
-    voice_ids = [313, 97]
+    #voice_ids = [313, 97]
+    voice_ids=[]
     language = "russian"
     is_cloning = False
-    test_original_file_location = "en_short_2_speakers.mp4"
 
     generate(
         project_id=test_project_id,

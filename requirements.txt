@@ -16,3 +16,4 @@ openai-whisper
 TTS
 torchaudio
 azure-ai-translation-text
+firebase_admin
